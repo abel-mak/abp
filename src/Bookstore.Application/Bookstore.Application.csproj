@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>Bookstore</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bookstore.Domain\Bookstore.Domain.csproj" />
+    <ProjectReference Include="..\Bookstore.Application.Contracts\Bookstore.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Account.Application" Version="7.0.3" />
+    <PackageReference Include="Volo.Abp.Identity.Application" Version="7.0.3" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Application" Version="7.0.3" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Application" Version="7.0.3" />
+    <PackageReference Include="Volo.Abp.FeatureManagement.Application" Version="7.0.3" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Application" Version="7.0.3" />
+  </ItemGroup>
+
+</Project>
