@@ -65,9 +65,9 @@ namespace Bookstore.Authors
             await _authorRepository.DeleteAsync(id);
         }
 
-        public async Task<List<AuthorDto>> SearchAsync(string search)
+        public async Task<List<AuthorDto>> GetSearchAsync(string name)
         {
-            List<Author> res = await _authorRepository.SearchAsync(search);
+            List<Author> res = await _authorRepository.SearchAsync(name);
 
             return ObjectMapper.Map<List<Author>, List<AuthorDto>>(res);
         }

@@ -9,6 +9,9 @@ namespace Bookstore.Books
     public class CreateUpdateBookDto
     {
         [Required]
+        public Guid AuthorId { get; set; }
+
+        [Required]
         [StringLength(128)]
         public string Name { get; set;}
 
