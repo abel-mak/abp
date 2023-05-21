@@ -16,7 +16,7 @@ using Volo.Abp.TenantManagement.EntityFrameworkCore;
 
 using Bookstore.Books;
 using Bookstore.Authors;
-
+using Bookstore.Orders;
 
 namespace Bookstore.EntityFrameworkCore;
 
@@ -30,7 +30,7 @@ public class BookstoreDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
-    #region Entities from the modules
+    #region Entities  from the modules
 
     /* Notice: We only implemented IIdentityDbContext and ITenantManagementDbContext
      * and replaced them for this DbContext. This allows you to perform JOIN
@@ -38,7 +38,7 @@ public class BookstoreDbContext :
      * typically don't need that for other modules. But, if you need, you can
      * implement the DbContext interface of the needed module and use ReplaceDbContext
      * attribute just like IIdentityDbContext and ITenantManagementDbContext.
-     *
+     *     
      * More info: Replacing a DbContext of a module ensures that the related module
      * uses this DbContext on runtime. Otherwise, it will use its own DbContext class.
      */
@@ -103,6 +103,18 @@ public class BookstoreDbContext :
             .HasMaxLength(AuthorConsts.MaxNameLength);
 
             b.HasIndex(x => x.Name);
+        });
+
+        builder.Entity<Order>(b =>
+        {
+            b.ToTable(BookstoreConsts.DbTablePrefix + "Orders" + BookstoreConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.BookId).IsRequired();
+           
+            //not added to migration yet
+            b.HasOne<IdentityUser>().WithMany().HasForeignKey(x => x.UserId).IsRequired();
+
+            b.HasOne<Book>().WithOne().HasForeignKey<Order>(x => x.BookId);
         });
     }
 }

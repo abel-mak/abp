@@ -7,9 +7,11 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bookstore.Books
 {
+    [Authorize]
     public class BookAppService :
         CrudAppService<Book, BookDto, Guid, PagedAndSortedResultRequestDto, CreateUpdateBookDto>, IBookAppService
     {
@@ -37,6 +39,7 @@ namespace Bookstore.Books
 
             BookDto res = ObjectMapper.Map<Book, BookDto>(queryResult.book);
             res.AuthorName = queryResult.author.Name;
+
             return res;
         }
 
@@ -67,6 +70,11 @@ namespace Bookstore.Books
             long totalCount = await _authorRepository.GetCountAsync();
 
             return new PagedResultDto<BookDto>(totalCount, res);
+        }
+
+        public void UploadFile()
+        {
+
         }
     }
 }

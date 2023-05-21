@@ -28,9 +28,9 @@ using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using Volo.Abp.AspNetCore.ExceptionHandling;
 
 namespace Bookstore;
-
 [DependsOn(
     typeof(BookstoreHttpApiModule),
     typeof(AbpAutofacModule),
@@ -192,7 +192,7 @@ public class BookstoreHttpApiHostModule : AbpModule
         app.UseStaticFiles();
         app.UseRouting();
         app.UseCors();
-        //app.UseAuthentication();
+        app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
 
         if (MultiTenancyConsts.IsEnabled)

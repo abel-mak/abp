@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Volo.Abp;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Sqlite;
@@ -29,6 +30,7 @@ public class BookstoreEntityFrameworkCoreTestModule : AbpModule
     private void ConfigureInMemorySqlite(IServiceCollection services)
     {
         _sqliteConnection = CreateDatabaseAndGetConnection();
+
 
         services.Configure<AbpDbContextOptions>(options =>
         {
