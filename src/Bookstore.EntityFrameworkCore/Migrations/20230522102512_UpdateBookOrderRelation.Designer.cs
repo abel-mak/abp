@@ -4,6 +4,7 @@ using Bookstore.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Bookstore.Migrations
 {
     [DbContext(typeof(BookstoreDbContext))]
-    partial class BookstoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230522102512_UpdateBookOrderRelation")]
+    partial class UpdateBookOrderRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -172,7 +175,8 @@ namespace Bookstore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookId");
+                    b.HasIndex("BookId")
+                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -1803,8 +1807,8 @@ namespace Bookstore.Migrations
             modelBuilder.Entity("Bookstore.Orders.Order", b =>
                 {
                     b.HasOne("Bookstore.Books.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BookId")
+                        .WithOne()
+                        .HasForeignKey("Bookstore.Orders.Order", "BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -1,34 +1,35 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using Bookstore.EntityFrameworkCore;
+using Bookstore.MultiTenancy;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Bookstore.EntityFrameworkCore;
-using Bookstore.MultiTenancy;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Microsoft.OpenApi.Models;
 using OpenIddict.Validation.AspNetCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Volo.Abp;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
-using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
-using Volo.Abp.AspNetCore.ExceptionHandling;
+using Microsoft.AspNetCore.Http;
+using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 
 namespace Bookstore;
 [DependsOn(
@@ -69,6 +70,28 @@ public class BookstoreHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
+
+        context.Services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.OnAppendCookie = ctx =>
+            {
+                ctx.CookieOptions.SameSite = SameSiteMode.None;
+            };
+        });
+
+        //context.Services.AddCors(options =>
+        //{
+        //    options.AddPolicy("AllowCredentials",
+        //    builder =>
+        //    {
+        //        builder.WithOrigins("http://localhost:4200").AllowCredentials().AllowAnyHeader().AllowAnyMethod();
+        //    });
+        //});
+
+        Configure<AbpAntiForgeryOptions>(options =>
+        {
+            options.AutoValidate = false;
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -155,22 +178,21 @@ public class BookstoreHttpApiHostModule : AbpModule
         {
             options.AddDefaultPolicy(builder =>
                {
-                builder
-                    .WithOrigins(
-                        configuration["App:CorsOrigins"]
-                            .Split(",", StringSplitOptions.RemoveEmptyEntries)
-                            .Select(o => o.RemovePostFix("/"))
-                            .ToArray()
-                    )
-                    .WithAbpExposedHeaders()
-                    .SetIsOriginAllowedToAllowWildcardSubdomains()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials();
-            });
+                   builder
+                       .WithOrigins(
+                           configuration["App:CorsOrigins"]
+                               .Split(",", StringSplitOptions.RemoveEmptyEntries)
+                               .Select(o => o.RemovePostFix("/"))
+                               .ToArray()
+                       )
+                       .WithAbpExposedHeaders()
+                       .SetIsOriginAllowedToAllowWildcardSubdomains()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials();
+               });
         });
     }
-
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
         var app = context.GetApplicationBuilder();
@@ -188,6 +210,8 @@ public class BookstoreHttpApiHostModule : AbpModule
             app.UseErrorPage();
         }
 
+        app.UseCookiePolicy();
+
         app.UseCorrelationId();
         app.UseStaticFiles();
         app.UseRouting();
@@ -202,6 +226,7 @@ public class BookstoreHttpApiHostModule : AbpModule
 
         app.UseUnitOfWork();
         app.UseAuthorization();
+
 
         app.UseSwagger();
         app.UseAbpSwaggerUI(c =>

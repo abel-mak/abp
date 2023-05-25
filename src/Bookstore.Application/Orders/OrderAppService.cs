@@ -1,11 +1,13 @@
 ﻿using Bookstore.Books;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Identity;
+using Volo.Abp.Users;
 
 namespace Bookstore.Orders
 {
@@ -14,13 +16,18 @@ namespace Bookstore.Orders
         private readonly IOrderRepository _orderRepository;
         private readonly IRepository<Book, Guid> _bookRepository;
         private readonly IRepository<IdentityUser> _userRepository;
+        private readonly ICurrentUser _currentUser;
+
         public OrderAppService(IOrderRepository orderRepository,
             IRepository<Book, Guid> bookRepository,
-            IRepository<IdentityUser> userRepository)
+            IRepository<IdentityUser> userRepository,
+            ICurrentUser currentUser)
+
         {
             _orderRepository = orderRepository;
             _bookRepository = bookRepository;
             _userRepository = userRepository;
+            _currentUser = currentUser;
         }
 
         public async Task<OrderDto> GetAsync(Guid id)
@@ -75,6 +82,10 @@ namespace Bookstore.Orders
         {
             Order order = ObjectMapper.Map<CreateUpdateOrderDto, Order>(input);
             order.OrderTime = DateTime.Now;
+            if (_currentUser.Id != null)
+            {
+                order.UserId = _currentUser.GetId();
+            }
 
             Order insertRes = await _orderRepository.InsertAsync(order);
 

@@ -92,6 +92,7 @@ public class BookstoreDbContext :
             b.Property(x => x.Name).IsRequired().HasMaxLength(128);
 
             b.HasOne<Author>().WithMany().HasForeignKey(x => x.AuthorId).IsRequired();
+            b.HasMany<Order>().WithOne().HasForeignKey(x => x.BookId).IsRequired();
         });
 
         builder.Entity<Author>(b => 
@@ -113,8 +114,6 @@ public class BookstoreDbContext :
            
             //not added to migration yet
             b.HasOne<IdentityUser>().WithMany().HasForeignKey(x => x.UserId).IsRequired();
-
-            b.HasOne<Book>().WithOne().HasForeignKey<Order>(x => x.BookId);
         });
     }
 }
